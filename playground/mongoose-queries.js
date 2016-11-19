@@ -18,6 +18,7 @@ User.findById(id).then((user) => { // 3 Promise cases, success, error, catch exc
 }, (e) => {
   console.log('Unable to find user', e);
 }).catch((e) => console.log(e));
+
 // var id = 'a5830ad14496704e02ab87b1f'; //id of one document
 //
 // if (!ObjectID.isValid(id)) {
