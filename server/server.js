@@ -1,7 +1,7 @@
 const {ObjectID} = require('mongodb');
-
-var express = require('express');
-var bodyParser = require('body-parser');
+const _ = require('lodash');
+const express = require('express');
+const bodyParser = require('body-parser');
 
 var {mongoose} = require('./db/mongoose.js'); //destructuring here means only pull the mongoose export from requirement
 var {Todo} = require('./models/todo');
@@ -56,7 +56,6 @@ app.delete('/todos/:id', (req, res) => { //successful promise case
   if(!ObjectID.isValid(id)) {
     return res.status(400).send(); // id is not valid
   }
-
   Todo.findByIdAndRemove(id).then((todo) => {
     if (!todo) {
       return res.status(404).send(); // item was not found/deleted
@@ -65,6 +64,32 @@ app.delete('/todos/:id', (req, res) => { //successful promise case
   }, (e) => {
     res.status(404).send(); // failed promise case
   }).catch((e) => res.status(404).send()); //exception
+});
+
+
+app.patch('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  var body = _.pick(req.body, ['text', 'completed']);
+
+  if(!ObjectID.isValid(id)) {
+    return res.status(400).send(); // id is not valid
+  }
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    }
+    res.send({todo})
+  }).catch((e) => {
+    res.status(400).send();
+  })
 });
 
 app.listen(port, () => {
