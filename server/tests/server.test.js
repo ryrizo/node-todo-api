@@ -10,7 +10,9 @@ const todos = [{
   text: "First test todo"
 }, {
   _id: new ObjectID(),
-  text: "Second test todo"
+  text: "Second test todo",
+  completed: true,
+  completedAt: 333
 }];
 
 //testing lifecycle method
@@ -132,3 +134,59 @@ describe('DELETE /todos/:id', () => {
       });
   });
 });//end delete /todos/:id
+
+describe('PATCH /todos/:id', () => {
+  it('should update todo', (done) => {
+    var id = todos[0]._id.toHexString();
+    var info = {
+      text: "Look at me I changed with patch",
+      completed: true
+    };
+    request(app)
+      .patch(`/todos/${id}`)
+      .send(info)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Todo.findById(id).then((todo) => {
+          if (!todo) {
+            return done();
+          }
+          expect(todo.text).toBe(info.text);
+          expect(todo.completedAt).toBeA('number');
+          expect(todo.completed).toBe(true);
+          done();
+        }, (err) => {
+          done(err);
+        }).catch((e) => done(e));
+      });
+  });//end of it
+
+  it('should clear completedAt when todo is not completed', (done) => {
+    var id = todos[1]._id.toHexString();
+    var info = {
+      text: "Setting to false with patch",
+      completed: false
+    };
+    request(app)
+      .patch(`/todos/${id}`)
+      .send(info)
+      .expect(200)
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Todo.findById(id).then((todo) => {
+          if (!todo) {
+            return done();
+          }
+          expect(todo.text).toBe(info.text);
+          expect(todo.completedAt).toNotExist();
+          expect(todo.completed).toBe(false);
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+});
