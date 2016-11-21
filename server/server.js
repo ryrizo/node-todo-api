@@ -1,3 +1,5 @@
+require('./config/config');
+
 const {ObjectID} = require('mongodb');
 const _ = require('lodash');
 const express = require('express');
@@ -8,7 +10,6 @@ var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 
 var app = express();
-const port = process.env.PORT || 3000; //if there use it, if local use 3000
 
 app.use(bodyParser.json());
 
@@ -82,7 +83,7 @@ app.patch('/todos/:id', (req, res) => {
     body.completedAt = null;
   }
 
-  Todo.findByIdAndUpdate(id, {$set: body}, {$new: true}).then((todo) => {
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
     if (!todo) {
       return res.status(404).send();
     }
@@ -92,7 +93,7 @@ app.patch('/todos/:id', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`Started up at port ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Started up at port ${process.env.PORT}`);
 });
 module.exports = {app};
