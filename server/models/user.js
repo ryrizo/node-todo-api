@@ -68,9 +68,9 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
+//mongoose middleware function
 UserSchema.pre('save', function (next) {
   var user = this;
-
 
   if (user.isModified('password')) {
     bcrypt.genSalt(10, (err, salt) => {

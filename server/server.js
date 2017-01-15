@@ -102,7 +102,9 @@ app.post('/users', (req, res) => {
       return user.generateAuthToken(); // this returns a promise, so we tack on another then
     }).then((token) => {
       res.header('x-auth', token).send(user);
-    }).catch((e) => res.status(400).send(e));
+    }).catch((e) => {
+      res.status(400).send(e);
+    });
 });//end post users
 
 app.get('/users/me', authenticate, (req, res) => {
